@@ -1,65 +1,80 @@
-import Image from "next/image";
+'use client';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
+  const router = useRouter();
+  const [joinCode, setJoinCode] = useState('');
+  const [creating, setCreating] = useState(false);
+  const [error, setError] = useState('');
+
+  async function handleCreate() {
+    setCreating(true);
+    setError('');
+    try {
+      const res = await fetch('/api/game', { method: 'POST' });
+      const data = await res.json();
+      router.push(`/${data.gameId}`);
+    } catch {
+      setError('Failed to create game');
+      setCreating(false);
+    }
+  }
+
+  function handleJoin() {
+    const code = joinCode.trim().toUpperCase();
+    if (!code) return;
+    router.push(`/${code}`);
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center px-6">
+      <div className="w-full max-w-sm space-y-10">
+        {/* Title */}
+        <div className="text-center space-y-2">
+          <h1 className="text-5xl font-black tracking-tight text-white">SMACKY 5000</h1>
+          <p className="text-zinc-400 text-sm uppercase tracking-widest">Multiplayer Chess Clock</p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+
+        {/* Create */}
+        <div className="space-y-3">
+          {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+          <button
+            onClick={handleCreate}
+            disabled={creating}
+            className="w-full bg-green-500 hover:bg-green-400 active:bg-green-600 disabled:bg-zinc-700 disabled:text-zinc-500 text-black font-bold text-xl rounded-2xl py-5 transition-colors"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            {creating ? 'Creating…' : 'New Game'}
+          </button>
         </div>
-      </main>
+
+        {/* Divider */}
+        <div className="flex items-center gap-3">
+          <div className="flex-1 h-px bg-zinc-800" />
+          <span className="text-zinc-600 text-xs uppercase tracking-widest">or join</span>
+          <div className="flex-1 h-px bg-zinc-800" />
+        </div>
+
+        {/* Join */}
+        <div className="space-y-3">
+          <input
+            type="text"
+            placeholder="Enter game code"
+            value={joinCode}
+            onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
+            onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
+            maxLength={8}
+            className="w-full bg-zinc-900 border border-zinc-700 text-white placeholder-zinc-600 rounded-xl px-4 py-3 text-lg font-mono text-center uppercase tracking-widest focus:outline-none focus:border-zinc-500"
+          />
+          <button
+            onClick={handleJoin}
+            disabled={!joinCode.trim()}
+            className="w-full bg-zinc-800 hover:bg-zinc-700 active:bg-zinc-600 disabled:bg-zinc-900 disabled:text-zinc-700 text-white font-bold text-lg rounded-2xl py-4 transition-colors"
+          >
+            Join Game
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
