@@ -68,7 +68,7 @@ export default function Home() {
             value={joinCode}
             onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
             onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
-            maxLength={8}
+            maxLength={3}
             className="show-input text-center font-mono uppercase tracking-widest text-xl"
             style={{ fontFamily: 'var(--font-mono)' }}
           />

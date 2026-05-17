@@ -4,7 +4,7 @@ import { setGame } from '@/lib/store';
 import type { GameState } from '@/lib/types';
 
 export async function POST() {
-  const gameId = uuid().slice(0, 8).toUpperCase();
+  const gameId = uuid().slice(0, 3).toUpperCase();
   const game: GameState = {
     id: gameId,
     hostId: '',
