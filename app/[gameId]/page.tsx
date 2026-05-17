@@ -11,6 +11,8 @@ interface Session {
   isHost: boolean;
 }
 
+type GamePayload = GameState & { _serverTime?: number };
+
 function sessionKey(gameId: string) {
   return `smacky-session-${gameId}`;
 }
@@ -19,8 +21,18 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
   const { gameId } = use(params);
   const [session, setSession] = useState<Session | null>(null);
   const [game, setGame] = useState<GameState | null>(null);
+  const [clockOffset, setClockOffset] = useState(0);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
+
+  function applyPayload(data: GamePayload) {
+    if (data._serverTime) {
+      setClockOffset(data._serverTime - Date.now());
+    }
+    const { _serverTime, ...state } = data;
+    void _serverTime;
+    setGame(state as GameState);
+  }
 
   // Load session from localStorage
   useEffect(() => {
@@ -42,10 +54,10 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
       setLoading(false);
       return;
     }
-    const data: GameState = await res.json();
-    setGame(data);
+    const data: GamePayload = await res.json();
+    applyPayload(data);
     setLoading(false);
-  }, [gameId]);
+  }, [gameId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     fetchGame();
@@ -61,8 +73,8 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
       const { getPusherClient } = await import('@/lib/pusher-client');
       const pusher = getPusherClient();
       channel = pusher.subscribe(`game-${gameId}`);
-      channel.bind('state', (data: GameState) => {
-        setGame(data);
+      channel.bind('state', (data: GamePayload) => {
+        applyPayload(data);
       });
     }
 
@@ -99,7 +111,6 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
 
   if (!game) return null;
 
-  // Player isn't in the game yet (or game exists but they haven't joined)
   if (!session) {
     if (game.status !== 'settings') {
       return (
@@ -113,10 +124,8 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
     return <JoinView gameId={gameId} onJoin={handleJoin} />;
   }
 
-  // Validate that player is still in the game
   const playerInGame = game.players.some((p) => p.id === session.playerId);
   if (!playerInGame && game.status === 'settings') {
-    // Host removed them or they have a stale session
     localStorage.removeItem(sessionKey(gameId));
     setSession(null);
     return null;
@@ -126,5 +135,5 @@ export default function GamePage({ params }: { params: Promise<{ gameId: string 
     return <SettingsView game={game} myPlayerId={session.playerId} />;
   }
 
-  return <GameView game={game} myPlayerId={session.playerId} />;
+  return <GameView game={game} myPlayerId={session.playerId} clockOffset={clockOffset} />;
 }

@@ -8,5 +8,5 @@ export async function GET(
   const { gameId } = await params;
   const game = await getGame(gameId);
   if (!game) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-  return NextResponse.json(game);
+  return NextResponse.json({ ...game, _serverTime: Date.now() });
 }

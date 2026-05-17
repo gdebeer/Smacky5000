@@ -5,6 +5,7 @@ import type { GameState } from '@/lib/types';
 interface Props {
   game: GameState;
   myPlayerId: string;
+  clockOffset?: number; // server time minus client time (ms)
 }
 
 function formatTime(ms: number): string {
@@ -33,7 +34,8 @@ function playBuzzer() {
   } catch { /* ignore - autoplay blocked */ }
 }
 
-export default function GameView({ game, myPlayerId }: Props) {
+export default function GameView({ game, myPlayerId, clockOffset = 0 }: Props) {
+  const now = () => Date.now() + clockOffset;
   const [displayMs, setDisplayMs] = useState<number>(0);
   const [phaseMs, setPhaseMs] = useState<number>(0);
   const timeoutCalled = useRef(false);
@@ -59,7 +61,7 @@ export default function GameView({ game, myPlayerId }: Props) {
   useEffect(() => {
     if (game.status === 'playing' && game.turnStartedAt) {
       const tick = () => {
-        const elapsed = Date.now() - game.turnStartedAt!;
+        const elapsed = now() - game.turnStartedAt!;
         const remaining = isMyTurn
           ? Math.max(0, (myPlayer?.timeRemainingMs ?? 0) - elapsed)
           : (myPlayer?.timeRemainingMs ?? 0);
@@ -100,7 +102,7 @@ export default function GameView({ game, myPlayerId }: Props) {
   useEffect(() => {
     if ((game.status === 'buffer' || game.status === 'countdown') && game.phaseStartedAt && game.phaseDurationMs) {
       const tick = () => {
-        const elapsed = Date.now() - game.phaseStartedAt!;
+        const elapsed = now() - game.phaseStartedAt!;
         const remaining = Math.max(0, game.phaseDurationMs! - elapsed);
         setPhaseMs(remaining);
         if (remaining <= 0 && !startNextCalled.current) {

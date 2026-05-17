@@ -17,5 +17,5 @@ function getPusher(): Pusher {
 }
 
 export async function broadcastState(gameId: string, state: GameState) {
-  await getPusher().trigger(`game-${gameId}`, 'state', state);
+  await getPusher().trigger(`game-${gameId}`, 'state', { ...state, _serverTime: Date.now() });
 }
