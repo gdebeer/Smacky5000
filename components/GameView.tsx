@@ -45,16 +45,10 @@ export default function GameView({ game, myPlayerId, clockOffset = 0 }: Props) {
   const currentPlayer = game.players[game.currentPlayerIndex];
   const isMyTurn = currentPlayer?.id === myPlayerId;
   const myTimedOut = myPlayer?.timedOut ?? false;
-  const isRedState = isMyTurn && (myTimedOut || displayMs <= 0) && game.status === 'playing';
+  const isWarnState = isMyTurn && (myTimedOut || displayMs <= 0) && game.status === 'playing';
 
-  useEffect(() => {
-    timeoutCalled.current = false;
-    buzzerPlayed.current = false;
-  }, [game.currentPlayerIndex, game.status]);
-
-  useEffect(() => {
-    startNextCalled.current = false;
-  }, [game.status]);
+  useEffect(() => { timeoutCalled.current = false; buzzerPlayed.current = false; }, [game.currentPlayerIndex, game.status]);
+  useEffect(() => { startNextCalled.current = false; }, [game.status]);
 
   // Timer tick
   useEffect(() => {
@@ -114,76 +108,89 @@ export default function GameView({ game, myPlayerId, clockOffset = 0 }: Props) {
     await fetch(`/api/game/${game.id}/cancel`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ playerId: myPlayerId }) });
   }
 
-  // ── Finished screen ──────────────────────────────────────────────────
+  // ── Finished ─────────────────────────────────────────────────────
   if (game.status === 'finished') {
     return (
-      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center px-6 gap-8">
-        <div className="text-center space-y-3">
-          <div className="w-20 h-20 rounded-full bg-zinc-800 flex items-center justify-center text-4xl mx-auto">🏁</div>
-          <h1 className="text-3xl font-black text-white tracking-tight">Game Over</h1>
+      <div className="min-h-screen flex flex-col items-center justify-center px-6 gap-8" style={{ background: 'var(--show-paper)' }}>
+        <div>
+          <div className="show-sticker mb-3" style={{ display: 'inline-flex' }}>Game Over</div>
+          <h1 className="font-black" style={{ fontSize: '2.5rem', color: 'var(--show-ink)', letterSpacing: '-0.03em' }}>Final Times</h1>
         </div>
         <div className="w-full max-w-sm space-y-2">
           {[...game.players].sort((a, b) => a.order - b.order).map((p, i) => (
-            <div key={p.id} className={`flex items-center gap-3 rounded-2xl px-4 py-3 border ${p.id === myPlayerId ? 'bg-zinc-900 border-white/10' : 'bg-zinc-900/50 border-transparent'}`}>
-              <span className="text-zinc-600 text-sm font-mono w-4">{i + 1}</span>
-              <span className="text-white flex-1 font-medium">{p.name}{p.id === myPlayerId ? <span className="text-zinc-500 text-xs ml-2">you</span> : ''}</span>
-              <span className={`font-mono text-sm font-bold ${p.timedOut ? 'text-red-400' : 'text-emerald-400'}`}>
+            <div key={p.id} className="show-card show-bord-1 flex items-center gap-3" style={{ padding: '12px 14px', boxShadow: p.id === myPlayerId ? 'var(--show-shadow-sm)' : 'none' }}>
+              <span className="font-mono font-bold text-sm w-5" style={{ color: 'var(--show-ink-3)' }}>{i + 1}</span>
+              <span className="flex-1 font-semibold" style={{ color: 'var(--show-ink)' }}>
+                {p.name}{p.id === myPlayerId ? <span className="show-caps ml-2">you</span> : ''}
+              </span>
+              <span className="font-mono font-bold text-sm" style={{ color: p.timedOut ? 'var(--show-warn)' : 'var(--show-good)' }}>
                 {p.timedOut ? 'Out' : formatTime(p.timeRemainingMs)}
               </span>
             </div>
           ))}
         </div>
-        <a href="/" className="text-zinc-500 hover:text-zinc-300 text-sm transition-colors">← Back to home</a>
+        <a href="/" className="show-btn show-btn-ink" style={{ padding: '10px 20px' }}>← Home</a>
       </div>
     );
   }
 
-  // ── Main game screen ─────────────────────────────────────────────────
+  // ── Main game screen ──────────────────────────────────────────────
+  const bgColor = isWarnState ? 'var(--show-warn)' : 'var(--show-paper)';
+
   return (
-    <div className={`min-h-screen flex flex-col transition-colors duration-500 ${isRedState ? 'bg-red-950' : 'bg-zinc-950'}`}>
+    <div className="min-h-screen flex flex-col" style={{ background: bgColor, transition: 'background 0.3s ease' }}>
 
       {/* Header */}
-      <div className="flex items-center justify-between px-5 pt-8 pb-2">
+      <div className="flex items-center justify-between px-4 pt-6 pb-3" style={{ borderBottom: '1.5px solid var(--show-line)' }}>
         <div>
-          <p className="text-zinc-600 text-[11px] uppercase tracking-widest mb-0.5">Your time</p>
-          <p className="text-white font-semibold text-base truncate max-w-[180px]">{myPlayer?.name ?? '—'}</p>
+          <span className="show-caps">Your time</span>
+          <p className="font-bold text-base mt-0.5 truncate max-w-[180px]" style={{ color: isWarnState ? '#fff' : 'var(--show-ink)' }}>
+            {myPlayer?.name ?? '—'}
+          </p>
         </div>
         {(game.status === 'playing' || game.status === 'buffer') && (
-          <button
-            onClick={handlePause}
-            className="w-10 h-10 rounded-full bg-zinc-800 hover:bg-zinc-700 active:bg-zinc-600 text-white flex items-center justify-center transition-colors text-base"
-          >
-            ⏸
+          <button onClick={handlePause} className="show-btn show-btn-ink" style={{ padding: '7px 12px', fontSize: '13px' }}>
+            ⏸ Pause
           </button>
         )}
       </div>
 
       {/* Timer */}
-      <div className="flex-none px-5 pt-2 pb-3 text-center">
-        <p
-          className={`font-mono font-black leading-none tabular-nums transition-colors duration-300 ${
-            isRedState ? 'text-red-300' : isMyTurn && game.status === 'playing' ? 'text-white' : 'text-zinc-500'
-          }`}
-          style={{ fontSize: 'clamp(3.5rem, 20vw, 6.5rem)', textShadow: isMyTurn && !isRedState && game.status === 'playing' ? '0 0 40px rgba(255,255,255,0.15)' : 'none' }}
+      <div className="flex-none px-4 pt-4 pb-3">
+        <div
+          className="show-bord"
+          style={{
+            background: isWarnState ? 'rgba(0,0,0,0.15)' : 'var(--show-card)',
+            boxShadow: isWarnState ? 'none' : 'var(--show-shadow)',
+            padding: '16px',
+            textAlign: 'center',
+          }}
         >
-          {formatTime(displayMs)}
-        </p>
-        {myTimedOut && (
-          <p className="text-red-400 text-xs font-bold uppercase tracking-widest mt-1">Time&apos;s up</p>
-        )}
+          <p
+            className="font-mono font-black leading-none tabular-nums"
+            style={{
+              fontSize: 'clamp(3.5rem, 20vw, 7rem)',
+              color: isWarnState ? '#fff' : (isMyTurn && game.status === 'playing' ? 'var(--show-ink)' : 'var(--show-ink-3)'),
+            }}
+          >
+            {formatTime(displayMs)}
+          </p>
+          {myTimedOut && (
+            <p className="show-caps mt-1" style={{ color: isWarnState ? '#fff' : 'var(--show-warn)' }}>Time&apos;s up!</p>
+          )}
+        </div>
       </div>
 
-      {/* Player order strip */}
-      <div className="px-5 pb-4">
-        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
+      {/* Player strip */}
+      <div className="px-4 pb-3">
+        <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
           {[...game.players].sort((a, b) => a.order - b.order).map((p) => (
-            <div key={p.id} className={`shrink-0 rounded-full px-3 py-1 text-xs font-medium border transition-colors ${
-              p.id === currentPlayer?.id
-                ? 'bg-emerald-500/20 border-emerald-500/60 text-emerald-300'
-                : p.timedOut
-                  ? 'bg-transparent border-zinc-800 text-zinc-700 line-through'
-                  : 'bg-zinc-900 border-zinc-800 text-zinc-500'
-            }`}>
+            <div
+              key={p.id}
+              className={`show-tag shrink-0 ${
+                p.id === currentPlayer?.id ? 'active' : p.timedOut ? 'done' : 'muted'
+              }`}
+            >
               {p.name}{p.id === myPlayerId ? ' ·you' : ''}
             </div>
           ))}
@@ -191,13 +198,13 @@ export default function GameView({ game, myPlayerId, clockOffset = 0 }: Props) {
       </div>
 
       {/* Action area */}
-      <div className="flex-1 flex items-center justify-center px-6 pb-10">
+      <div className="flex-1 flex flex-col px-4 pb-6" style={{ minHeight: '200px' }}>
 
         {/* Countdown */}
         {game.status === 'countdown' && (
-          <div className="text-center space-y-3">
-            <p className="text-zinc-500 text-xs uppercase tracking-widest">Starting in</p>
-            <p className="text-white font-black font-mono leading-none" style={{ fontSize: 'clamp(5rem, 35vmin, 9rem)' }}>
+          <div className="flex-1 flex flex-col items-center justify-center gap-2">
+            <span className="show-caps">Starting in</span>
+            <p className="font-mono font-black leading-none" style={{ fontSize: 'clamp(5rem, 35vmin, 9rem)', color: 'var(--show-ink)' }}>
               {phaseMs > 0 ? Math.ceil(phaseMs / 1000) : 'GO!'}
             </p>
           </div>
@@ -205,46 +212,35 @@ export default function GameView({ game, myPlayerId, clockOffset = 0 }: Props) {
 
         {/* Buffer */}
         {game.status === 'buffer' && (
-          <div className="text-center space-y-2">
-            <p className="text-zinc-500 text-xs uppercase tracking-widest">Next up</p>
-            <p className="text-white text-2xl font-bold">{currentPlayer?.name}</p>
-            <p className="text-zinc-300 font-mono font-black" style={{ fontSize: 'clamp(4rem, 25vmin, 8rem)' }}>
+          <div className="flex-1 flex flex-col items-center justify-center gap-2">
+            <span className="show-caps">Next up</span>
+            <p className="font-bold text-2xl" style={{ color: 'var(--show-ink)' }}>{currentPlayer?.name}</p>
+            <p className="font-mono font-black leading-none" style={{ fontSize: 'clamp(4rem, 25vmin, 8rem)', color: 'var(--show-accent)' }}>
               {Math.ceil(phaseMs / 1000)}
             </p>
           </div>
         )}
 
-        {/* Playing — big round button */}
+        {/* Playing */}
         {game.status === 'playing' && (
           <button
             onClick={handleEndTurn}
             disabled={!isMyTurn || myTimedOut}
-            style={{
-              width: 'min(70vmin, 280px)',
-              height: 'min(70vmin, 280px)',
-              boxShadow: isMyTurn && !myTimedOut
-                ? '0 0 0 2px rgba(52,211,153,0.3), 0 0 80px rgba(52,211,153,0.25), 0 20px 60px rgba(0,0,0,0.5)'
-                : 'none',
-            }}
-            className={`rounded-full font-black text-2xl leading-tight transition-all duration-150 active:scale-95 select-none flex flex-col items-center justify-center gap-1 ${
-              isMyTurn && !myTimedOut
-                ? 'bg-emerald-500 text-black'
-                : myTimedOut && isMyTurn
-                  ? 'bg-red-900 border-2 border-red-700 text-red-300 cursor-not-allowed'
-                  : 'bg-zinc-900 border border-zinc-800 text-zinc-700 cursor-not-allowed'
-            }`}
+            className={`show-action-btn ${!isMyTurn ? 'waiting' : ''} ${myTimedOut && isMyTurn ? 'timed-out' : ''}`}
+            style={{ minHeight: '200px' }}
           >
             {isMyTurn && !myTimedOut && (
-              <>
-                <span className="text-3xl font-black tracking-tight">END</span>
-                <span className="text-3xl font-black tracking-tight">TURN</span>
-              </>
+              <span style={{ fontSize: 'clamp(1.8rem, 10vw, 3rem)', fontWeight: 900, letterSpacing: '-0.02em', color: 'var(--show-ink)' }}>
+                END TURN
+              </span>
             )}
-            {isMyTurn && myTimedOut && <span className="text-xl">TIME&apos;S UP</span>}
+            {isMyTurn && myTimedOut && (
+              <span style={{ fontSize: '1.5rem', fontWeight: 900, color: '#fff' }}>TIME&apos;S UP</span>
+            )}
             {!isMyTurn && (
-              <div className="text-center px-4">
-                <p className="text-zinc-600 text-sm font-normal uppercase tracking-widest mb-1">Waiting for</p>
-                <p className="text-zinc-400 text-xl font-bold">{currentPlayer?.name}</p>
+              <div style={{ textAlign: 'center' }}>
+                <p className="show-caps mb-1">Waiting for</p>
+                <p style={{ fontSize: '1.4rem', fontWeight: 700, color: 'var(--show-ink-2)' }}>{currentPlayer?.name}</p>
               </div>
             )}
           </button>
@@ -253,27 +249,20 @@ export default function GameView({ game, myPlayerId, clockOffset = 0 }: Props) {
 
       {/* Pause overlay */}
       {game.status === 'paused' && (
-        <div className="fixed inset-0 bg-black/70 backdrop-blur-md flex flex-col items-center justify-center gap-8 z-50 px-6">
-          <div className="text-center space-y-2">
-            <div className="w-16 h-16 rounded-full bg-zinc-800 flex items-center justify-center text-2xl mx-auto mb-4">⏸</div>
-            <h2 className="text-3xl font-black text-white tracking-tight">Paused</h2>
-            <p className="text-zinc-400 text-sm">
+        <div className="fixed inset-0 flex flex-col items-center justify-center gap-8 z-50 px-6" style={{ background: 'rgba(21,22,26,0.85)', backdropFilter: 'blur(4px)' }}>
+          <div style={{ background: 'var(--show-paper)', border: '3px solid var(--show-ink)', boxShadow: 'var(--show-shadow-lg)', padding: '32px 24px', width: '100%', maxWidth: '340px' }}>
+            <div className="show-sticker mb-4" style={{ display: 'inline-flex' }}>⏸ Paused</div>
+            <p className="font-semibold text-sm mb-6" style={{ color: 'var(--show-ink-2)' }}>
               {currentPlayer?.name}&apos;s turn · {formatTime(game.pausedTimeRemainingMs ?? 0)} left
             </p>
-          </div>
-          <div className="w-full max-w-xs space-y-3">
-            <button
-              onClick={handleResume}
-              className="w-full bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 text-black font-bold text-lg rounded-full py-4 transition-colors"
-            >
-              Resume Game
-            </button>
-            <button
-              onClick={handleCancel}
-              className="w-full border border-zinc-700 hover:border-zinc-500 text-zinc-400 hover:text-zinc-200 font-medium text-base rounded-full py-3 transition-colors"
-            >
-              Back to Settings
-            </button>
+            <div className="space-y-3">
+              <button onClick={handleResume} className="show-btn show-btn-primary w-full" style={{ padding: '14px', fontSize: '1rem', boxShadow: 'var(--show-shadow)' }}>
+                Resume Game
+              </button>
+              <button onClick={handleCancel} className="show-btn w-full" style={{ padding: '12px' }}>
+                Back to Settings
+              </button>
+            </div>
           </div>
         </div>
       )}

@@ -28,41 +28,36 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center px-6">
-      <div className="w-full max-w-xs space-y-12">
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12" style={{ background: 'var(--show-paper)' }}>
+      <div className="w-full max-w-xs space-y-10">
 
         {/* Title */}
-        <div className="text-center space-y-1">
-          <h1 className="text-5xl font-black tracking-tight text-white">SMACKY</h1>
-          <h1 className="text-5xl font-black tracking-tight text-emerald-400">5000</h1>
-          <p className="text-zinc-600 text-xs uppercase tracking-widest pt-1">Multiplayer Clock</p>
+        <div>
+          <div className="show-sticker mb-4" style={{ display: 'inline-flex' }}>Multiplayer Clock</div>
+          <h1 className="font-black leading-none" style={{ fontSize: 'clamp(3rem, 18vw, 5rem)', color: 'var(--show-ink)', letterSpacing: '-0.03em' }}>
+            SMACKY<br />
+            <span style={{ color: 'var(--show-accent)' }}>5000</span>
+          </h1>
         </div>
 
-        {/* New game — big round button */}
-        <div className="flex flex-col items-center gap-4">
-          {error && <p className="text-red-400 text-sm">{error}</p>}
+        {/* Create */}
+        <div className="space-y-3">
+          {error && <p className="show-caps" style={{ color: 'var(--show-warn)' }}>{error}</p>}
           <button
             onClick={handleCreate}
             disabled={creating}
-            style={{ boxShadow: '0 0 60px rgba(52,211,153,0.2), 0 20px 40px rgba(0,0,0,0.4)' }}
-            className="w-48 h-48 rounded-full bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 disabled:bg-zinc-800 disabled:shadow-none text-black font-black text-xl transition-all duration-150 active:scale-95 flex flex-col items-center justify-center gap-0.5"
+            className="show-btn show-btn-primary w-full"
+            style={{ padding: '18px', fontSize: '1.25rem', boxShadow: 'var(--show-shadow-lg)' }}
           >
-            {creating ? (
-              <span className="text-lg">Creating…</span>
-            ) : (
-              <>
-                <span className="text-2xl font-black tracking-tight">NEW</span>
-                <span className="text-2xl font-black tracking-tight">GAME</span>
-              </>
-            )}
+            {creating ? 'Creating…' : 'New Game'}
           </button>
         </div>
 
         {/* Divider */}
         <div className="flex items-center gap-3">
-          <div className="flex-1 h-px bg-zinc-800" />
-          <span className="text-zinc-700 text-xs uppercase tracking-widest">or join</span>
-          <div className="flex-1 h-px bg-zinc-800" />
+          <div className="flex-1" style={{ height: '1.5px', background: 'var(--show-line)' }} />
+          <span className="show-caps">or join</span>
+          <div className="flex-1" style={{ height: '1.5px', background: 'var(--show-line)' }} />
         </div>
 
         {/* Join */}
@@ -74,12 +69,14 @@ export default function Home() {
             onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
             onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
             maxLength={8}
-            className="w-full bg-zinc-900 border border-zinc-800 focus:border-zinc-600 text-white placeholder-zinc-700 rounded-2xl px-4 py-3 text-lg font-mono text-center uppercase tracking-widest focus:outline-none transition-colors"
+            className="show-input text-center font-mono uppercase tracking-widest text-xl"
+            style={{ fontFamily: 'var(--font-mono)' }}
           />
           <button
             onClick={handleJoin}
             disabled={!joinCode.trim()}
-            className="w-full bg-zinc-800 hover:bg-zinc-700 active:bg-zinc-600 disabled:bg-zinc-900 disabled:text-zinc-700 text-white font-bold text-base rounded-full py-3.5 transition-colors"
+            className="show-btn show-btn-ink w-full"
+            style={{ padding: '14px' }}
           >
             Join Game
           </button>

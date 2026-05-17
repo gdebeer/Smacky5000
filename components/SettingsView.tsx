@@ -64,49 +64,50 @@ export default function SettingsView({ game, myPlayerId }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white">
-      <div className="max-w-lg mx-auto px-4 py-8 space-y-6">
+    <div className="min-h-screen px-4 py-6 space-y-5" style={{ background: 'var(--show-paper)' }}>
+      <div className="max-w-lg mx-auto space-y-5">
 
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-start justify-between">
           <div>
-            <h1 className="text-2xl font-black tracking-tight">SMACKY 5000</h1>
-            <p className="text-zinc-600 text-xs uppercase tracking-widest">Game Setup</p>
+            <h1 className="font-black leading-none" style={{ fontSize: '1.8rem', color: 'var(--show-ink)', letterSpacing: '-0.03em' }}>
+              SMACKY <span style={{ color: 'var(--show-accent)' }}>5000</span>
+            </h1>
+            <span className="show-caps">Game Setup</span>
           </div>
           <div className="text-right">
-            <p className="text-zinc-600 text-[10px] uppercase tracking-widest mb-0.5">Code</p>
-            <p className="font-mono text-2xl font-black text-emerald-400">{game.id}</p>
+            <span className="show-caps">Code</span>
+            <p className="font-mono font-black text-2xl mt-0.5" style={{ color: 'var(--show-accent)', letterSpacing: '0.05em' }}>{game.id}</p>
           </div>
         </div>
 
-        {/* Share link */}
-        <button
-          onClick={copyLink}
-          className="w-full bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 rounded-2xl px-4 py-3 text-left transition-colors group"
-        >
-          <p className="text-zinc-600 text-[10px] uppercase tracking-widest mb-1">Invite link — tap to copy</p>
-          <p className="text-zinc-400 group-hover:text-zinc-300 text-sm font-mono truncate transition-colors">
-            {copied ? '✓ Copied!' : (typeof window !== 'undefined' ? `${window.location.origin}/${game.id}` : `…/${game.id}`)}
-          </p>
+        {/* Share */}
+        <button onClick={copyLink} className="show-btn show-btn-ghost w-full text-left" style={{ padding: '10px 12px', borderColor: 'var(--show-line)' }}>
+          <div>
+            <span className="show-caps">Invite link — tap to copy</span>
+            <p className="font-mono text-sm mt-0.5 truncate" style={{ color: copied ? 'var(--show-good)' : 'var(--show-ink-2)' }}>
+              {copied ? '✓ Copied!' : (typeof window !== 'undefined' ? `${window.location.origin}/${game.id}` : `…/${game.id}`)}
+            </p>
+          </div>
         </button>
 
         {/* Players */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           <div className="flex items-center justify-between">
-            <p className="text-zinc-500 text-xs uppercase tracking-widest">Players ({game.players.length})</p>
-            {saving && <p className="text-zinc-700 text-xs">Saving…</p>}
+            <span className="show-caps">Players ({game.players.length})</span>
+            {saving && <span className="show-caps">Saving…</span>}
           </div>
 
           {game.players.length === 0 && (
-            <div className="border border-dashed border-zinc-800 rounded-2xl p-8 text-center text-zinc-700 text-sm">
-              Waiting for players to join…
+            <div className="show-dash p-8 text-center">
+              <span className="show-caps">Waiting for players to join…</span>
             </div>
           )}
 
           {game.players.map((player, index) => (
-            <div key={player.id} className={`bg-zinc-900 rounded-2xl p-4 border ${player.id === myPlayerId ? 'border-white/8' : 'border-transparent'}`}>
+            <div key={player.id} className="show-card show-bord-1" style={{ padding: '12px 14px', boxShadow: player.id === myPlayerId ? 'var(--show-shadow-sm)' : 'none' }}>
               <div className="flex items-center gap-3">
-                <span className="text-zinc-700 text-sm font-mono w-4 shrink-0">{index + 1}</span>
+                <span className="font-mono text-sm font-bold w-5 shrink-0" style={{ color: 'var(--show-ink-3)' }}>{index + 1}</span>
 
                 {isHost ? (
                   <input
@@ -115,12 +116,13 @@ export default function SettingsView({ game, myPlayerId }: Props) {
                     onChange={(e) => updatePlayerName(player.id, e.target.value)}
                     onBlur={(e) => updatePlayerName(player.id, e.target.value.trim() || player.name)}
                     maxLength={20}
-                    className="flex-1 bg-zinc-800 text-white rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-zinc-600 min-w-0"
+                    className="show-input flex-1 min-w-0"
+                    style={{ padding: '6px 10px', fontSize: '14px' }}
                   />
                 ) : (
-                  <span className="flex-1 text-white font-medium text-sm">
+                  <span className="flex-1 font-semibold" style={{ color: 'var(--show-ink)' }}>
                     {player.name}
-                    {player.id === myPlayerId && <span className="text-zinc-600 text-xs ml-2">you</span>}
+                    {player.id === myPlayerId && <span className="show-caps ml-2">you</span>}
                   </span>
                 )}
 
@@ -132,23 +134,24 @@ export default function SettingsView({ game, myPlayerId }: Props) {
                         value={msToSeconds(player.allocatedTimeMs)}
                         onChange={(e) => updatePlayerTime(player.id, Number(e.target.value))}
                         min={5} max={3600}
-                        className="w-16 bg-zinc-800 text-white rounded-xl px-2 py-2 text-sm text-right focus:outline-none focus:ring-1 focus:ring-zinc-600"
+                        className="show-input text-right font-mono"
+                        style={{ width: '64px', padding: '6px 8px', fontSize: '14px' }}
                       />
-                      <span className="text-zinc-600 text-xs">s</span>
+                      <span className="show-caps">s</span>
                     </div>
                   ) : (
-                    <span className="text-zinc-500 text-sm font-mono">{msToSeconds(player.allocatedTimeMs)}s</span>
+                    <span className="font-mono text-sm font-bold" style={{ color: 'var(--show-ink-2)' }}>{msToSeconds(player.allocatedTimeMs)}s</span>
                   )}
 
                   {isHost && (
-                    <div className="flex flex-col gap-0.5 ml-1">
-                      <button onClick={() => movePlayer(index, -1)} disabled={index === 0} className="text-zinc-600 hover:text-zinc-300 disabled:opacity-20 text-xs leading-none">▲</button>
-                      <button onClick={() => movePlayer(index, 1)} disabled={index === game.players.length - 1} className="text-zinc-600 hover:text-zinc-300 disabled:opacity-20 text-xs leading-none">▼</button>
+                    <div className="flex flex-col gap-0.5">
+                      <button onClick={() => movePlayer(index, -1)} disabled={index === 0} style={{ color: 'var(--show-ink-3)', fontSize: '10px', lineHeight: 1, opacity: index === 0 ? 0.2 : 1 }}>▲</button>
+                      <button onClick={() => movePlayer(index, 1)} disabled={index === game.players.length - 1} style={{ color: 'var(--show-ink-3)', fontSize: '10px', lineHeight: 1, opacity: index === game.players.length - 1 ? 0.2 : 1 }}>▼</button>
                     </div>
                   )}
 
                   {isHost && game.players.length > 1 && (
-                    <button onClick={() => removePlayer(player.id)} className="text-zinc-700 hover:text-red-400 text-xl leading-none ml-1 transition-colors">×</button>
+                    <button onClick={() => removePlayer(player.id)} className="show-caps ml-1" style={{ color: 'var(--show-ink-3)', fontSize: '16px' }}>×</button>
                   )}
                 </div>
               </div>
@@ -156,79 +159,64 @@ export default function SettingsView({ game, myPlayerId }: Props) {
           ))}
         </div>
 
-        {/* Settings */}
-        <div className="bg-zinc-900 rounded-2xl overflow-hidden border border-transparent">
-          <p className="text-zinc-600 text-[10px] uppercase tracking-widest px-4 pt-4 pb-2">Game Settings</p>
+        {/* Game Settings */}
+        <div className="show-card show-bord" style={{ boxShadow: 'var(--show-shadow)' }}>
+          <div style={{ padding: '10px 14px', borderBottom: '1.5px solid var(--show-line)' }}>
+            <span className="show-caps">Game Settings</span>
+          </div>
 
-          <div className="divide-y divide-zinc-800">
-            {/* Default time */}
-            <div className="flex items-center justify-between px-4 py-3">
+          {[
+            { label: 'Default Time', sublabel: 'Seconds per player', key: 'defaultTimeSeconds', value: game.defaultTimeSeconds, unit: 's', min: 5, max: 3600 },
+            { label: 'Buffer Time', sublabel: 'Pause between turns', key: 'bufferSeconds', value: game.bufferSeconds, unit: 's', min: 0, max: 60 },
+            { label: 'Countdown', sublabel: 'Before game starts (0 = off)', key: 'countdownSeconds', value: game.countdownSeconds, unit: 's', min: 0, max: 10 },
+          ].map((row) => (
+            <div key={row.key} className="flex items-center justify-between" style={{ padding: '12px 14px', borderBottom: '1px solid var(--show-line-soft)' }}>
               <div>
-                <p className="text-white text-sm font-medium">Default Time</p>
-                <p className="text-zinc-600 text-xs">Seconds per player</p>
+                <p className="font-semibold text-sm" style={{ color: 'var(--show-ink)' }}>{row.label}</p>
+                <span className="show-caps">{row.sublabel}</span>
               </div>
               {isHost ? (
                 <div className="flex items-center gap-1">
-                  <input type="number" value={game.defaultTimeSeconds} onChange={(e) => save({ defaultTimeSeconds: Number(e.target.value) })} min={5} max={3600}
-                    className="w-20 bg-zinc-800 text-white rounded-xl px-2 py-1.5 text-sm text-right focus:outline-none focus:ring-1 focus:ring-zinc-600" />
-                  <span className="text-zinc-600 text-xs">s</span>
-                </div>
-              ) : <span className="text-zinc-400 text-sm font-mono">{game.defaultTimeSeconds}s</span>}
-            </div>
-
-            {/* Buffer */}
-            <div className="flex items-center justify-between px-4 py-3">
-              <div>
-                <p className="text-white text-sm font-medium">Buffer Time</p>
-                <p className="text-zinc-600 text-xs">Pause between turns</p>
-              </div>
-              {isHost ? (
-                <div className="flex items-center gap-1">
-                  <input type="number" value={game.bufferSeconds} onChange={(e) => save({ bufferSeconds: Number(e.target.value) })} min={0} max={60}
-                    className="w-16 bg-zinc-800 text-white rounded-xl px-2 py-1.5 text-sm text-right focus:outline-none focus:ring-1 focus:ring-zinc-600" />
-                  <span className="text-zinc-600 text-xs">s</span>
-                </div>
-              ) : <span className="text-zinc-400 text-sm font-mono">{game.bufferSeconds}s</span>}
-            </div>
-
-            {/* Countdown */}
-            <div className="flex items-center justify-between px-4 py-3">
-              <div>
-                <p className="text-white text-sm font-medium">Countdown</p>
-                <p className="text-zinc-600 text-xs">Before game starts (0 = skip)</p>
-              </div>
-              {isHost ? (
-                <div className="flex items-center gap-1">
-                  <input type="number" value={game.countdownSeconds} onChange={(e) => save({ countdownSeconds: Number(e.target.value) })} min={0} max={10}
-                    className="w-16 bg-zinc-800 text-white rounded-xl px-2 py-1.5 text-sm text-right focus:outline-none focus:ring-1 focus:ring-zinc-600" />
-                  <span className="text-zinc-600 text-xs">s</span>
-                </div>
-              ) : <span className="text-zinc-400 text-sm font-mono">{game.countdownSeconds > 0 ? `${game.countdownSeconds}s` : 'Off'}</span>}
-            </div>
-
-            {/* Timeout behavior */}
-            <div className="px-4 py-3 space-y-2">
-              <p className="text-white text-sm font-medium">When Time Runs Out</p>
-              {isHost ? (
-                <div className="flex gap-2">
-                  {(['skip', 'pause'] as const).map((opt) => (
-                    <button
-                      key={opt}
-                      onClick={() => save({ timeoutBehavior: opt })}
-                      className={`flex-1 py-2 rounded-full text-sm font-medium transition-colors ${
-                        game.timeoutBehavior === opt
-                          ? 'bg-emerald-500 text-black'
-                          : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'
-                      }`}
-                    >
-                      {opt === 'skip' ? 'Skip to Next' : 'Pause Game'}
-                    </button>
-                  ))}
+                  <input
+                    type="number"
+                    value={row.value}
+                    onChange={(e) => save({ [row.key]: Number(e.target.value) })}
+                    min={row.min} max={row.max}
+                    className="show-input text-right font-mono"
+                    style={{ width: '72px', padding: '6px 8px', fontSize: '14px' }}
+                  />
+                  <span className="show-caps">{row.unit}</span>
                 </div>
               ) : (
-                <p className="text-zinc-400 text-sm capitalize">{game.timeoutBehavior === 'skip' ? 'Skip to next player' : 'Pause game'}</p>
+                <span className="font-mono font-bold text-sm" style={{ color: 'var(--show-ink-2)' }}>{row.value}{row.unit}</span>
               )}
             </div>
+          ))}
+
+          <div style={{ padding: '12px 14px' }}>
+            <p className="font-semibold text-sm mb-2" style={{ color: 'var(--show-ink)' }}>When Time Runs Out</p>
+            {isHost ? (
+              <div className="flex gap-2">
+                {(['skip', 'pause'] as const).map((opt) => (
+                  <button
+                    key={opt}
+                    onClick={() => save({ timeoutBehavior: opt })}
+                    className="show-btn flex-1"
+                    style={{
+                      padding: '8px',
+                      background: game.timeoutBehavior === opt ? 'var(--show-accent)' : 'var(--show-card)',
+                      boxShadow: game.timeoutBehavior === opt ? 'var(--show-shadow-sm)' : 'none',
+                    }}
+                  >
+                    {opt === 'skip' ? 'Skip to Next' : 'Pause Game'}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <span className="font-semibold text-sm" style={{ color: 'var(--show-ink-2)' }}>
+                {game.timeoutBehavior === 'skip' ? 'Skip to next player' : 'Pause game'}
+              </span>
+            )}
           </div>
         </div>
 
@@ -237,18 +225,18 @@ export default function SettingsView({ game, myPlayerId }: Props) {
           <button
             onClick={handleStart}
             disabled={starting || game.players.length === 0}
-            style={{ boxShadow: game.players.length > 0 ? '0 0 40px rgba(52,211,153,0.15)' : 'none' }}
-            className="w-full bg-emerald-500 hover:bg-emerald-400 active:bg-emerald-600 disabled:bg-zinc-800 disabled:text-zinc-600 text-black font-bold text-lg rounded-full py-4 transition-all"
+            className="show-btn show-btn-primary w-full"
+            style={{ padding: '18px', fontSize: '1.1rem', boxShadow: 'var(--show-shadow-lg)' }}
           >
             {starting ? 'Starting…' : 'Start Game'}
           </button>
         ) : (
-          <div className="border border-dashed border-zinc-800 rounded-2xl p-5 text-center text-zinc-600 text-sm">
-            Waiting for host to start…
+          <div className="show-dash p-5 text-center">
+            <span className="show-caps">Waiting for host to start…</span>
           </div>
         )}
 
-        <div className="pb-4" />
+        <div className="pb-6" />
       </div>
     </div>
   );

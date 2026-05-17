@@ -1,10 +1,14 @@
 @import "tailwindcss";
+@import "./show.css";
 
 * {
   -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
 }
 
 html, body {
   overscroll-behavior: none;
-  background: #09090b;
+  background: var(--show-paper);
+  color: var(--show-ink);
+  font-family: var(--font-sans), system-ui, sans-serif;
 }

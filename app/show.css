@@ -1,0 +1,137 @@
+/* ─────────────────────────────────────────────────────────────────
+   Smacky 5000 — design tokens (ported from Game Show style)
+   ───────────────────────────────────────────────────────────────── */
+
+:root {
+  --show-ink:        #15161a;
+  --show-ink-2:      #3a3b3f;
+  --show-ink-3:      #6b6c70;
+  --show-paper:      #ece5d0;
+  --show-paper-2:    #e2d9bc;
+  --show-card:       #ffffff;
+  --show-line:       #cfcbbd;
+  --show-line-soft:  #e6e2d4;
+  --show-accent:     #ff9f1c;   /* warm orange */
+  --show-accent-2:   #a06bff;   /* purple */
+  --show-good:       #1fa463;
+  --show-warn:       #ff5b34;
+  --show-shadow:     4px 4px 0 var(--show-ink);
+  --show-shadow-sm:  3px 3px 0 var(--show-ink);
+  --show-shadow-lg:  6px 6px 0 var(--show-ink);
+}
+
+/* ── Type ───────────────────────────────────────────────────── */
+.show-caps {
+  font-family: var(--font-mono), ui-monospace, monospace;
+  text-transform: uppercase;
+  letter-spacing: .1em;
+  font-size: 11px;
+  color: var(--show-ink-3);
+  font-weight: 500;
+}
+
+/* ── Surfaces ───────────────────────────────────────────────── */
+.show-paper  { background: var(--show-paper);   color: var(--show-ink); }
+.show-paper2 { background: var(--show-paper-2); color: var(--show-ink); }
+.show-card   { background: var(--show-card);    color: var(--show-ink); border: 1px solid var(--show-line); }
+.show-ink-bg { background: var(--show-ink);     color: var(--show-paper); }
+
+/* ── Borders / shadows ──────────────────────────────────────── */
+.show-bord    { border: 2px solid var(--show-ink); }
+.show-bord-1  { border: 1.5px solid var(--show-ink); }
+.show-dash    { border: 1.5px dashed var(--show-ink); }
+.show-shadow    { box-shadow: var(--show-shadow); }
+.show-shadow-sm { box-shadow: var(--show-shadow-sm); }
+.show-shadow-lg { box-shadow: var(--show-shadow-lg); }
+
+/* ── Tags ───────────────────────────────────────────────────── */
+.show-tag {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 10px;
+  background: var(--show-card);
+  border: 1.5px solid var(--show-ink);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--show-ink);
+}
+.show-tag.active { background: var(--show-accent); border-color: var(--show-ink); }
+.show-tag.muted  { border-color: var(--show-line); color: var(--show-ink-3); }
+.show-tag.done   { background: var(--show-paper-2); border-color: var(--show-line); color: var(--show-ink-3); text-decoration: line-through; }
+
+/* ── Buttons ────────────────────────────────────────────────── */
+.show-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 10px 18px;
+  background: var(--show-card);
+  border: 2px solid var(--show-ink);
+  font-weight: 700; font-size: 14px; cursor: pointer;
+  transition: transform .08s ease, box-shadow .08s ease;
+  color: var(--show-ink);
+  user-select: none;
+}
+.show-btn:hover  { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--show-ink); }
+.show-btn:active { transform: translate(4px, 4px); box-shadow: none; }
+.show-btn:disabled { opacity: .35; cursor: not-allowed; transform: none !important; box-shadow: none !important; }
+
+.show-btn-primary { background: var(--show-accent) !important; color: var(--show-ink) !important; }
+.show-btn-ink     { background: var(--show-ink)    !important; color: var(--show-paper) !important; }
+.show-btn-warn    { background: var(--show-warn)   !important; color: #fff !important; }
+.show-btn-good    { background: var(--show-good)   !important; color: #fff !important; }
+.show-btn-ghost   { border-color: var(--show-line) !important; box-shadow: none !important; }
+.show-btn-ghost:hover { background: color-mix(in oklab, var(--show-ink) 6%, transparent) !important; transform: none !important; box-shadow: none !important; }
+
+/* ── Big action button (END TURN) ───────────────────────────── */
+.show-action-btn {
+  width: 100%; flex: 1;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  background: var(--show-accent);
+  border: 3px solid var(--show-ink);
+  box-shadow: var(--show-shadow-lg);
+  font-weight: 900; font-size: 2rem; letter-spacing: -0.01em;
+  color: var(--show-ink);
+  cursor: pointer;
+  transition: transform .08s ease, box-shadow .08s ease;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.show-action-btn:active {
+  transform: translate(6px, 6px);
+  box-shadow: none;
+}
+.show-action-btn.waiting {
+  background: var(--show-paper-2);
+  border-color: var(--show-line);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.show-action-btn.timed-out {
+  background: var(--show-warn);
+  border-color: var(--show-ink);
+  box-shadow: var(--show-shadow-lg);
+  color: white;
+  cursor: not-allowed;
+}
+
+/* ── Inputs ─────────────────────────────────────────────────── */
+.show-input {
+  background: var(--show-card);
+  border: 1.5px solid var(--show-line);
+  padding: 10px 14px;
+  font-size: 15px;
+  color: var(--show-ink);
+  width: 100%;
+  outline: none;
+}
+.show-input:focus { border-color: var(--show-ink); box-shadow: 2px 2px 0 var(--show-ink); }
+
+/* ── Sticker ────────────────────────────────────────────────── */
+.show-sticker {
+  display: inline-flex; align-items: center;
+  padding: 2px 8px;
+  background: var(--show-accent);
+  border: 2px solid var(--show-ink);
+  transform: rotate(-1.5deg);
+  font-family: var(--font-mono), ui-monospace, monospace;
+  font-size: 11px; text-transform: uppercase; letter-spacing: .08em; font-weight: 700;
+  color: var(--show-ink);
+}

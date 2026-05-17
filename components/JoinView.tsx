@@ -22,10 +22,7 @@ export default function JoinView({ gameId, onJoin }: Props) {
         body: JSON.stringify({ name: name.trim() }),
       });
       const data = await res.json();
-      if (!res.ok) {
-        setError(data.error || 'Failed to join');
-        return;
-      }
+      if (!res.ok) { setError(data.error || 'Failed to join'); return; }
       onJoin(data.playerId, data.isHost);
     } catch {
       setError('Network error');
@@ -35,35 +32,42 @@ export default function JoinView({ gameId, onJoin }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center px-6">
+    <div className="min-h-screen flex flex-col items-center justify-center px-6" style={{ background: 'var(--show-paper)' }}>
       <div className="w-full max-w-sm space-y-8">
-        <div className="text-center space-y-2">
-          <h1 className="text-4xl font-black tracking-tight text-white">SMACKY 5000</h1>
-          <p className="text-zinc-400 text-sm uppercase tracking-widest">Multiplayer Clock</p>
+
+        <div>
+          <div className="show-sticker mb-3" style={{ display: 'inline-flex' }}>Join Game</div>
+          <h1 className="font-black leading-none" style={{ fontSize: '2.8rem', color: 'var(--show-ink)', letterSpacing: '-0.03em' }}>
+            SMACKY <span style={{ color: 'var(--show-accent)' }}>5000</span>
+          </h1>
         </div>
 
-        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-6 space-y-4">
-          <div className="text-center">
-            <p className="text-zinc-400 text-xs uppercase tracking-widest mb-1">Joining game</p>
-            <p className="text-white font-mono text-xl font-bold">{gameId}</p>
+        <div className="show-card show-bord show-shadow p-6 space-y-4">
+          <div>
+            <span className="show-caps">Game Code</span>
+            <p className="font-mono font-bold text-2xl mt-1" style={{ color: 'var(--show-accent)', letterSpacing: '0.05em' }}>{gameId}</p>
           </div>
 
           <div className="space-y-3">
-            <input
-              type="text"
-              placeholder="Your name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
-              maxLength={20}
-              className="w-full bg-zinc-800 border border-zinc-700 text-white placeholder-zinc-500 rounded-xl px-4 py-3 text-lg focus:outline-none focus:border-zinc-500"
-              autoFocus
-            />
-            {error && <p className="text-red-400 text-sm">{error}</p>}
+            <div>
+              <span className="show-caps">Your Name</span>
+              <input
+                type="text"
+                placeholder="Enter your name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
+                maxLength={20}
+                className="show-input mt-1"
+                autoFocus
+              />
+            </div>
+            {error && <p className="show-caps" style={{ color: 'var(--show-warn)' }}>{error}</p>}
             <button
               onClick={handleJoin}
               disabled={!name.trim() || loading}
-              className="w-full bg-green-500 hover:bg-green-400 active:bg-green-600 disabled:bg-zinc-700 disabled:text-zinc-500 text-black font-bold text-lg rounded-xl py-3 transition-colors"
+              className="show-btn show-btn-primary w-full"
+              style={{ padding: '14px', fontSize: '1rem', boxShadow: 'var(--show-shadow)' }}
             >
               {loading ? 'Joining…' : 'Join Game'}
             </button>
