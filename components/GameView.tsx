@@ -37,6 +37,7 @@ export default function GameView({ game, myPlayerId, clockOffset = 0 }: Props) {
   const now = () => Date.now() + clockOffset;
   const [displayMs, setDisplayMs] = useState(0);
   const [phaseMs, setPhaseMs] = useState(0);
+  const [ripples, setRipples] = useState<Array<{ id: number; x: number; y: number }>>([]);
   const timeoutCalled = useRef(false);
   const startNextCalled = useRef(false);
   const buzzerPlayed = useRef(false);
@@ -46,6 +47,9 @@ export default function GameView({ game, myPlayerId, clockOffset = 0 }: Props) {
   const isMyTurn = currentPlayer?.id === myPlayerId;
   const myTimedOut = myPlayer?.timedOut ?? false;
   const isWarnState = isMyTurn && (myTimedOut || displayMs <= 0) && game.status === 'playing';
+  const myColor = myPlayer?.color ?? '#00c4e8';
+  const currentColor = currentPlayer?.color ?? '#00c4e8';
+  const isLowTime = isMyTurn && displayMs > 0 && displayMs < 10000 && game.status === 'playing';
 
   useEffect(() => { timeoutCalled.current = false; buzzerPlayed.current = false; }, [game.currentPlayerIndex, game.status]);
   useEffect(() => { startNextCalled.current = false; }, [game.status]);
@@ -94,6 +98,14 @@ export default function GameView({ game, myPlayerId, clockOffset = 0 }: Props) {
     }
   }, [game.status, game.phaseStartedAt, game.phaseDurationMs, game.id, myPlayerId]);
 
+  function handlePointerDown(e: React.PointerEvent<HTMLButtonElement>) {
+    if (!isMyTurn || myTimedOut || game.status !== 'playing') return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const id = Date.now();
+    setRipples((r) => [...r, { id, x: e.clientX - rect.left, y: e.clientY - rect.top }]);
+    setTimeout(() => setRipples((r) => r.filter((rp) => rp.id !== id)), 700);
+  }
+
   async function handleEndTurn() {
     if (!isMyTurn || game.status !== 'playing') return;
     await fetch(`/api/game/${game.id}/turn`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ playerId: myPlayerId }) });
@@ -114,33 +126,29 @@ export default function GameView({ game, myPlayerId, clockOffset = 0 }: Props) {
       <div className="min-h-screen flex flex-col items-center justify-center px-6 gap-8">
         <div>
           <div className="show-sticker mb-3" style={{ display: 'inline-flex' }}>Game Over</div>
-          <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '2rem', color: 'var(--show-ink)', letterSpacing: '0.06em', fontWeight: 900 }}>
+          <h1 style={{ fontFamily: 'var(--font-sans)', fontSize: '2.2rem', color: 'var(--show-ink)', letterSpacing: '-0.02em', fontWeight: 900 }}>
             Final Times
           </h1>
         </div>
         <div className="w-full max-w-sm space-y-2">
           {[...game.players].sort((a, b) => a.order - b.order).map((p, i) => (
-            <div key={p.id} className="show-card flex items-center gap-3" style={{ padding: '12px 14px', boxShadow: p.id === myPlayerId ? 'var(--show-shadow-sm)' : 'none' }}>
+            <div key={p.id} className="show-card flex items-center gap-3" style={{ padding: '12px 16px', borderLeftColor: p.color, borderLeftWidth: 3 }}>
               <span className="font-mono font-bold text-sm w-5" style={{ color: 'var(--show-ink-3)' }}>{i + 1}</span>
               <span className="flex-1 font-semibold" style={{ color: 'var(--show-ink)' }}>
                 {p.name}{p.id === myPlayerId ? <span className="show-caps ml-2">you</span> : ''}
               </span>
               <span className="font-mono font-bold text-sm" style={{
                 color: p.timedOut ? 'var(--show-warn)' : 'var(--show-good)',
-                textShadow: p.timedOut ? '0 0 8px rgba(255,26,68,.4)' : '0 0 8px rgba(0,232,124,.4)',
               }}>
                 {p.timedOut ? 'OUT' : formatTime(p.timeRemainingMs)}
               </span>
             </div>
           ))}
         </div>
-        <a href="/" className="show-btn show-btn-ink" style={{ padding: '10px 20px', letterSpacing: '.06em' }}>← Home</a>
+        <a href="/" className="show-btn show-btn-ink" style={{ padding: '10px 24px' }}>← Home</a>
       </div>
     );
   }
-
-  // ── Timer class based on state ────────────────────────────────────
-  const timerClass = isWarnState ? 'g-timer-warn' : (isMyTurn && game.status === 'playing' ? 'g-timer-active' : 'g-timer-dim');
 
   // ── Main game screen ──────────────────────────────────────────────
   return (
@@ -148,14 +156,17 @@ export default function GameView({ game, myPlayerId, clockOffset = 0 }: Props) {
 
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-6 pb-3" style={{ borderBottom: '1px solid var(--show-line)' }}>
-        <div>
-          <span className="show-caps">Your time</span>
-          <p className="font-bold text-base mt-0.5 truncate max-w-[180px]" style={{ color: 'var(--show-ink)' }}>
-            {myPlayer?.name ?? '—'}
-          </p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <div style={{ width: 10, height: 10, borderRadius: '50%', background: myColor, boxShadow: `0 0 8px ${myColor}` }} />
+          <div>
+            <span className="show-caps">Your time</span>
+            <p className="font-bold text-sm mt-0.5 truncate max-w-[160px]" style={{ color: 'var(--show-ink)' }}>
+              {myPlayer?.name ?? '—'}
+            </p>
+          </div>
         </div>
         {(game.status === 'playing' || game.status === 'buffer') && (
-          <button onClick={handlePause} className="show-btn show-btn-ink" style={{ padding: '7px 14px', fontSize: '12px', letterSpacing: '.06em' }}>
+          <button onClick={handlePause} className="show-btn show-btn-ink" style={{ padding: '7px 14px', fontSize: '12px' }}>
             ⏸ Pause
           </button>
         )}
@@ -166,18 +177,33 @@ export default function GameView({ game, myPlayerId, clockOffset = 0 }: Props) {
         <div
           className="show-card"
           style={{
-            padding: '16px',
+            padding: '20px 16px',
             textAlign: 'center',
-            borderColor: isMyTurn && game.status === 'playing' && !isWarnState
-              ? 'rgba(0,196,232,.3)'
-              : isWarnState
-              ? 'rgba(255,26,68,.3)'
+            borderColor: isWarnState
+              ? 'rgba(255,71,87,.3)'
+              : isMyTurn && game.status === 'playing'
+              ? `${myColor}50`
               : 'var(--show-line)',
+            boxShadow: isMyTurn && game.status === 'playing' && !isWarnState
+              ? `0 0 24px ${myColor}14, inset 0 0 24px ${myColor}06`
+              : 'none',
           }}
         >
           <p
-            className={`font-mono font-black leading-none tabular-nums ${timerClass}`}
-            style={{ fontSize: 'clamp(3.5rem, 20vw, 7rem)' }}
+            className={`font-mono font-black leading-none tabular-nums ${
+              isWarnState ? 'g-timer-warn' : isMyTurn && game.status === 'playing' ? (isLowTime ? 'timer-pulse' : '') : 'g-timer-dim'
+            }`}
+            style={{
+              fontSize: 'clamp(3.5rem, 20vw, 7rem)',
+              color: isWarnState
+                ? 'var(--show-warn)'
+                : isMyTurn && game.status === 'playing'
+                ? myColor
+                : 'var(--show-ink-3)',
+              textShadow: isMyTurn && game.status === 'playing' && !isWarnState
+                ? `0 0 20px ${myColor}60, 0 0 60px ${myColor}20`
+                : undefined,
+            }}
           >
             {formatTime(displayMs)}
           </p>
@@ -190,16 +216,23 @@ export default function GameView({ game, myPlayerId, clockOffset = 0 }: Props) {
       {/* Player strip */}
       <div className="px-4 pb-3">
         <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
-          {[...game.players].sort((a, b) => a.order - b.order).map((p) => (
-            <div
-              key={p.id}
-              className={`show-tag shrink-0 ${
-                p.id === currentPlayer?.id ? 'active' : p.timedOut ? 'done' : 'muted'
-              }`}
-            >
-              {p.name}{p.id === myPlayerId ? ' ·you' : ''}
-            </div>
-          ))}
+          {[...game.players].sort((a, b) => a.order - b.order).map((p) => {
+            const isActive = p.id === currentPlayer?.id;
+            return (
+              <div
+                key={p.id}
+                className={`show-tag shrink-0 ${p.timedOut ? 'done' : ''}`}
+                style={isActive ? {
+                  background: `${p.color}20`,
+                  borderColor: `${p.color}80`,
+                  color: p.color,
+                  boxShadow: `0 0 10px ${p.color}30`,
+                } : {}}
+              >
+                {p.name}{p.id === myPlayerId ? ' ·you' : ''}
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -211,8 +244,13 @@ export default function GameView({ game, myPlayerId, clockOffset = 0 }: Props) {
           <div className="flex-1 flex flex-col items-center justify-center gap-2">
             <span className="show-caps">Starting in</span>
             <p
-              className="font-mono font-black leading-none g-timer-active"
-              style={{ fontSize: 'clamp(5rem, 35vmin, 9rem)' }}
+              key={phaseMs > 0 ? Math.ceil(phaseMs / 1000) : 'go'}
+              className="font-mono font-black leading-none count-pop"
+              style={{
+                fontSize: 'clamp(5rem, 35vmin, 9rem)',
+                color: 'var(--show-accent)',
+                textShadow: '0 0 30px rgba(0,196,232,.4)',
+              }}
             >
               {phaseMs > 0 ? Math.ceil(phaseMs / 1000) : 'GO!'}
             </p>
@@ -221,12 +259,20 @@ export default function GameView({ game, myPlayerId, clockOffset = 0 }: Props) {
 
         {/* Buffer */}
         {game.status === 'buffer' && (
-          <div className="flex-1 flex flex-col items-center justify-center gap-2">
+          <div key={game.currentPlayerIndex} className="flex-1 flex flex-col items-center justify-center gap-3 bloom-in">
             <span className="show-caps">Next up</span>
-            <p className="font-bold text-2xl" style={{ color: 'var(--show-ink)' }}>{currentPlayer?.name}</p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              <div style={{ width: 12, height: 12, borderRadius: '50%', background: currentColor, boxShadow: `0 0 10px ${currentColor}` }} />
+              <p className="font-bold text-2xl" style={{ color: 'var(--show-ink)' }}>{currentPlayer?.name}</p>
+            </div>
             <p
-              className="font-mono font-black leading-none"
-              style={{ fontSize: 'clamp(4rem, 25vmin, 8rem)', color: 'var(--show-accent)', textShadow: '0 0 24px rgba(0,196,232,.4)' }}
+              key={Math.ceil(phaseMs / 1000)}
+              className="font-mono font-black leading-none count-pop"
+              style={{
+                fontSize: 'clamp(4rem, 25vmin, 8rem)',
+                color: currentColor,
+                textShadow: `0 0 30px ${currentColor}60`,
+              }}
             >
               {Math.ceil(phaseMs / 1000)}
             </p>
@@ -236,23 +282,43 @@ export default function GameView({ game, myPlayerId, clockOffset = 0 }: Props) {
         {/* Playing */}
         {game.status === 'playing' && (
           <button
+            onPointerDown={handlePointerDown}
             onClick={handleEndTurn}
             disabled={!isMyTurn || myTimedOut}
             className={`show-action-btn ${!isMyTurn ? 'waiting' : ''} ${myTimedOut && isMyTurn ? 'timed-out' : ''}`}
-            style={{ minHeight: '200px' }}
+            style={{
+              minHeight: '200px',
+              ...(isMyTurn && !myTimedOut ? {
+                borderColor: `${myColor}55`,
+                color: myColor,
+                boxShadow: `0 0 40px ${myColor}12, inset 0 0 40px ${myColor}06`,
+              } : {}),
+            }}
           >
+            {/* Ripple effects */}
+            {ripples.map((rp) => (
+              <span
+                key={rp.id}
+                className="ripple-dot"
+                style={{ left: rp.x, top: rp.y, background: myColor }}
+              />
+            ))}
+
             {isMyTurn && !myTimedOut && (
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: 'clamp(1.6rem, 9vw, 2.8rem)', fontWeight: 900, letterSpacing: '0.18em' }}>
+              <span style={{ fontSize: 'clamp(1.6rem, 9vw, 2.8rem)', fontWeight: 900, letterSpacing: '0.1em', position: 'relative' }}>
                 END TURN
               </span>
             )}
             {isMyTurn && myTimedOut && (
-              <span style={{ fontFamily: 'var(--font-mono)', fontSize: '1.4rem', fontWeight: 900, letterSpacing: '0.14em' }}>TIME&apos;S UP</span>
+              <span style={{ fontSize: '1.4rem', fontWeight: 900, letterSpacing: '0.08em' }}>TIME&apos;S UP</span>
             )}
             {!isMyTurn && (
               <div style={{ textAlign: 'center' }}>
                 <p className="show-caps mb-2">Waiting for</p>
-                <p style={{ fontSize: '1.3rem', fontWeight: 600, color: 'var(--show-ink-2)', letterSpacing: '.04em' }}>{currentPlayer?.name}</p>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+                  <div style={{ width: 10, height: 10, borderRadius: '50%', background: currentColor, boxShadow: `0 0 8px ${currentColor}` }} />
+                  <p style={{ fontSize: '1.2rem', fontWeight: 700, color: 'var(--show-ink-2)' }}>{currentPlayer?.name}</p>
+                </div>
               </div>
             )}
           </button>
@@ -261,17 +327,20 @@ export default function GameView({ game, myPlayerId, clockOffset = 0 }: Props) {
 
       {/* Pause overlay */}
       {game.status === 'paused' && (
-        <div className="fixed inset-0 flex flex-col items-center justify-center gap-8 z-50 px-6" style={{ background: 'rgba(4,6,12,0.85)', backdropFilter: 'blur(8px)' }}>
-          <div className="show-card show-shadow" style={{ padding: '32px 24px', width: '100%', maxWidth: '340px', borderColor: 'rgba(0,196,232,.25)' }}>
+        <div className="fixed inset-0 flex flex-col items-center justify-center gap-8 z-50 px-6" style={{ background: 'rgba(4,4,8,0.88)', backdropFilter: 'blur(10px)' }}>
+          <div className="show-card show-shadow" style={{ padding: '32px 24px', width: '100%', maxWidth: '340px' }}>
             <div className="show-sticker mb-4" style={{ display: 'inline-flex' }}>⏸ Paused</div>
-            <p className="font-semibold text-sm mb-6" style={{ color: 'var(--show-ink-2)' }}>
-              {currentPlayer?.name}&apos;s turn · {formatTime(game.pausedTimeRemainingMs ?? 0)} left
-            </p>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '20px' }}>
+              <div style={{ width: 10, height: 10, borderRadius: '50%', background: currentColor, boxShadow: `0 0 8px ${currentColor}` }} />
+              <p className="font-semibold text-sm" style={{ color: 'var(--show-ink-2)' }}>
+                {currentPlayer?.name}&apos;s turn · {formatTime(game.pausedTimeRemainingMs ?? 0)} left
+              </p>
+            </div>
             <div className="space-y-3">
-              <button onClick={handleResume} className="show-btn show-btn-primary w-full" style={{ padding: '14px', fontSize: '0.95rem', letterSpacing: '.1em' }}>
+              <button onClick={handleResume} className="show-btn show-btn-primary w-full" style={{ padding: '14px', fontSize: '0.95rem' }}>
                 Resume Game
               </button>
-              <button onClick={handleCancel} className="show-btn w-full" style={{ padding: '12px', letterSpacing: '.06em' }}>
+              <button onClick={handleCancel} className="show-btn w-full" style={{ padding: '12px' }}>
                 Back to Settings
               </button>
             </div>

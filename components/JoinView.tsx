@@ -37,21 +37,12 @@ export default function JoinView({ gameId, onJoin }: Props) {
 
         <div>
           <div className="show-sticker mb-3" style={{ display: 'inline-flex' }}>Join Game</div>
-          <h1
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: '2.6rem',
-              color: 'var(--show-ink)',
-              letterSpacing: '0.04em',
-              lineHeight: 1,
-              fontWeight: 900,
-            }}
-          >
-            SMACKY <span style={{ color: 'var(--show-accent)', textShadow: '0 0 20px rgba(0,196,232,.4)' }}>5000</span>
+          <h1 style={{ fontFamily: 'var(--font-sans)', fontSize: '2.6rem', color: 'var(--show-ink)', letterSpacing: '-0.02em', lineHeight: 1, fontWeight: 900 }}>
+            SMACKY <span style={{ color: 'var(--show-accent)', textShadow: '0 0 20px rgba(0,196,232,.35)' }}>5000</span>
           </h1>
         </div>
 
-        <div className="show-card show-shadow" style={{ padding: '24px', borderColor: 'rgba(0,196,232,.2)' }}>
+        <div className="show-card show-shadow" style={{ padding: '24px' }}>
           <div className="space-y-4">
             <div>
               <span className="show-caps">Game Code</span>
@@ -77,7 +68,7 @@ export default function JoinView({ gameId, onJoin }: Props) {
                 onClick={handleJoin}
                 disabled={!name.trim() || loading}
                 className="show-btn show-btn-primary w-full"
-                style={{ padding: '14px', fontSize: '0.95rem', letterSpacing: '.1em' }}
+                style={{ padding: '14px', fontSize: '0.95rem' }}
               >
                 {loading ? 'Joining…' : 'Join Game'}
               </button>

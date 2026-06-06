@@ -11,6 +11,7 @@ export type TimeoutBehavior = 'skip' | 'pause';
 export interface PlayerState {
   id: string;
   name: string;
+  color: string;
   allocatedTimeMs: number;
   timeRemainingMs: number;
   order: number;

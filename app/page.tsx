@@ -34,18 +34,9 @@ export default function Home() {
         {/* Title */}
         <div>
           <div className="show-sticker mb-4" style={{ display: 'inline-flex' }}>Multiplayer Clock</div>
-          <h1
-            style={{
-              fontFamily: 'var(--font-display)',
-              fontSize: 'clamp(2.6rem, 16vw, 4.5rem)',
-              color: 'var(--show-ink)',
-              letterSpacing: '0.04em',
-              lineHeight: 1,
-              fontWeight: 900,
-            }}
-          >
+          <h1 style={{ fontFamily: 'var(--font-sans)', fontSize: 'clamp(2.8rem, 18vw, 5rem)', color: 'var(--show-ink)', letterSpacing: '-0.02em', lineHeight: 1, fontWeight: 900 }}>
             SMACKY<br />
-            <span style={{ color: 'var(--show-accent)', textShadow: '0 0 20px rgba(0,196,232,.4)' }}>5000</span>
+            <span style={{ color: 'var(--show-accent)', textShadow: '0 0 24px rgba(0,196,232,.35)' }}>5000</span>
           </h1>
         </div>
 
@@ -56,7 +47,7 @@ export default function Home() {
             onClick={handleCreate}
             disabled={creating}
             className="show-btn show-btn-primary w-full"
-            style={{ padding: '18px', fontSize: '1rem', letterSpacing: '.14em' }}
+            style={{ padding: '18px', fontSize: '1rem' }}
           >
             {creating ? 'Creating…' : 'New Game'}
           </button>
@@ -73,19 +64,19 @@ export default function Home() {
         <div className="space-y-3">
           <input
             type="text"
-            placeholder="Game code"
+            placeholder="ABC"
             value={joinCode}
             onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
             onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
             maxLength={3}
-            className="show-input text-center uppercase tracking-widest"
-            style={{ fontFamily: 'var(--font-mono)', fontSize: '1.5rem', letterSpacing: '0.3em' }}
+            className="show-input text-center uppercase"
+            style={{ fontFamily: 'var(--font-mono)', fontSize: '2rem', letterSpacing: '0.3em', padding: '16px' }}
           />
           <button
             onClick={handleJoin}
             disabled={!joinCode.trim()}
             className="show-btn show-btn-ink w-full"
-            style={{ padding: '14px', letterSpacing: '.08em' }}
+            style={{ padding: '14px' }}
           >
             Join Game
           </button>

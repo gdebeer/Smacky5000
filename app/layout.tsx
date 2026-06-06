@@ -1,23 +1,17 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk, JetBrains_Mono, Orbitron } from "next/font/google";
+import { Poppins, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
-const spaceGrotesk = Space_Grotesk({
+const poppins = Poppins({
   variable: "--font-sans",
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
+  weight: ["400", "600", "700", "800", "900"],
 });
 
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-mono",
   subsets: ["latin"],
   weight: ["400", "500", "600", "700"],
-});
-
-const orbitron = Orbitron({
-  variable: "--font-display",
-  subsets: ["latin"],
-  weight: ["700", "900"],
 });
 
 export const metadata: Metadata = {
@@ -34,7 +28,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${spaceGrotesk.variable} ${jetbrainsMono.variable} ${orbitron.variable} antialiased`}>
+    <html lang="en" className={`${poppins.variable} ${jetbrainsMono.variable} antialiased`}>
       <body className="min-h-screen">{children}</body>
     </html>
   );

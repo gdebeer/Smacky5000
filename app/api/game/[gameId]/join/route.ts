@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { v4 as uuid } from 'uuid';
 import { getGame, setGame } from '@/lib/store';
 import { broadcastState } from '@/lib/pusher-server';
+import { pickColor } from '@/lib/colors';
 import type { PlayerState } from '@/lib/types';
 
 export async function POST(
@@ -27,6 +28,7 @@ export async function POST(
   const player: PlayerState = {
     id: playerId,
     name: name.trim(),
+    color: pickColor(game.players.map((p) => p.color)),
     allocatedTimeMs: game.defaultTimeSeconds * 1000,
     timeRemainingMs: game.defaultTimeSeconds * 1000,
     order: game.players.length,
