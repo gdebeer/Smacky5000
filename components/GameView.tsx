@@ -123,7 +123,10 @@ export default function GameView({ game, myPlayerId, clockOffset = 0 }: Props) {
   // ── Finished ─────────────────────────────────────────────────────
   if (game.status === 'finished') {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center px-6 gap-8">
+      <div
+        className="min-h-screen flex flex-col items-center justify-center px-6 gap-8 player-bg"
+        style={{ '--show-accent': myColor } as React.CSSProperties}
+      >
         <div>
           <div className="show-sticker mb-3" style={{ display: 'inline-flex' }}>Game Over</div>
           <h1 style={{ fontFamily: 'var(--font-sans)', fontSize: '2.2rem', color: 'var(--show-ink)', letterSpacing: '-0.02em', fontWeight: 900 }}>
@@ -152,7 +155,10 @@ export default function GameView({ game, myPlayerId, clockOffset = 0 }: Props) {
 
   // ── Main game screen ──────────────────────────────────────────────
   return (
-    <div className={`min-h-screen flex flex-col ${isWarnState ? 'g-warn-bg' : ''}`}>
+    <div
+      className={`min-h-screen flex flex-col player-bg ${isWarnState ? 'g-warn-bg' : ''}`}
+      style={{ '--show-accent': myColor } as React.CSSProperties}
+    >
 
       {/* Header */}
       <div className="flex items-center justify-between px-4 pt-6 pb-3" style={{ borderBottom: '1px solid var(--show-line)' }}>
@@ -190,7 +196,7 @@ export default function GameView({ game, myPlayerId, clockOffset = 0 }: Props) {
           }}
         >
           <p
-            className={`font-mono font-black leading-none tabular-nums ${
+            className={`timer-display font-black leading-none ${
               isWarnState ? 'g-timer-warn' : isMyTurn && game.status === 'playing' ? (isLowTime ? 'timer-pulse' : '') : 'g-timer-dim'
             }`}
             style={{
@@ -245,11 +251,11 @@ export default function GameView({ game, myPlayerId, clockOffset = 0 }: Props) {
             <span className="show-caps">Starting in</span>
             <p
               key={phaseMs > 0 ? Math.ceil(phaseMs / 1000) : 'go'}
-              className="font-mono font-black leading-none count-pop"
+              className="timer-display font-black leading-none count-pop"
               style={{
                 fontSize: 'clamp(5rem, 35vmin, 9rem)',
                 color: 'var(--show-accent)',
-                textShadow: '0 0 30px rgba(0,196,232,.4)',
+                textShadow: `0 0 30px color-mix(in srgb, var(--show-accent) 40%, transparent)`,
               }}
             >
               {phaseMs > 0 ? Math.ceil(phaseMs / 1000) : 'GO!'}
@@ -267,7 +273,7 @@ export default function GameView({ game, myPlayerId, clockOffset = 0 }: Props) {
             </div>
             <p
               key={Math.ceil(phaseMs / 1000)}
-              className="font-mono font-black leading-none count-pop"
+              className="timer-display font-black leading-none count-pop"
               style={{
                 fontSize: 'clamp(4rem, 25vmin, 8rem)',
                 color: currentColor,

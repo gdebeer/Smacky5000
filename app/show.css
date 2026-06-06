@@ -109,15 +109,28 @@
   font-weight: 500;
 }
 
+/* ── Player-color theming — set --show-accent on a container
+      and all borders/tints follow automatically ────────────── */
+.player-bg {
+  background: color-mix(in srgb, var(--show-accent) 5%, var(--show-paper));
+}
+
+/* ── Timer: Poppins + tabular nums (not JetBrains Mono) ────── */
+.timer-display {
+  font-family: var(--font-sans), system-ui, sans-serif;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
 /* ── Surfaces ───────────────────────────────────────────────── */
 .show-card {
   background: var(--show-card);
   color: var(--show-ink);
-  border: 1px solid var(--show-line);
+  border: 1px solid color-mix(in srgb, var(--show-accent) 14%, var(--show-line));
   border-radius: 12px;
 }
 .show-dash {
-  border: 1px dashed var(--show-line);
+  border: 1px dashed color-mix(in srgb, var(--show-accent) 20%, var(--show-line));
   border-radius: 12px;
 }
 .show-shadow    { box-shadow: var(--show-shadow); }
@@ -158,7 +171,7 @@
   transition: border-color .15s, box-shadow .15s, background .15s, transform .1s;
   letter-spacing: .02em;
 }
-.show-btn:hover  { border-color: rgba(255,255,255,.15); background: rgba(255,255,255,.05); }
+.show-btn:hover  { border-color: color-mix(in srgb, var(--show-accent) 40%, var(--show-line)); background: color-mix(in srgb, var(--show-accent) 6%, transparent); }
 .show-btn:active { transform: scale(.97); }
 .show-btn:disabled { opacity: .25; cursor: not-allowed; transform: none !important; }
 
@@ -242,8 +255,8 @@
   transition: border-color .15s, box-shadow .15s;
 }
 .show-input:focus {
-  border-color: rgba(255,255,255,.2);
-  box-shadow: 0 0 0 3px rgba(255,255,255,.04);
+  border-color: color-mix(in srgb, var(--show-accent) 60%, transparent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--show-accent) 12%, transparent);
 }
 
 /* ── Chip ───────────────────────────────────────────────────── */

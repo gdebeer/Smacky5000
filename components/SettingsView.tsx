@@ -264,8 +264,13 @@ export default function SettingsView({ game, myPlayerId }: Props) {
     setTimeout(() => setCopied(false), 2000);
   }
 
+  const myColor = game.players.find((p) => p.id === myPlayerId)?.color;
+
   return (
-    <div className="min-h-screen px-4 py-6 space-y-5">
+    <div
+      className="min-h-screen px-4 py-6 space-y-5 player-bg"
+      style={myColor ? { '--show-accent': myColor } as React.CSSProperties : undefined}
+    >
       <div className="max-w-lg mx-auto space-y-5">
 
         {/* Header */}
