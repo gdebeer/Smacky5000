@@ -57,6 +57,11 @@ export default function SettingsView({ game, myPlayerId }: Props) {
     save({ players: game.players.filter((p) => p.id !== playerId).map((p, i) => ({ ...p, order: i })) });
   }
 
+  function shufflePlayers() {
+    const shuffled = [...game.players].sort(() => Math.random() - 0.5);
+    save({ players: shuffled.map((p, i) => ({ ...p, order: i })) });
+  }
+
   async function copyLink() {
     await navigator.clipboard.writeText(`${window.location.origin}/${game.id}`);
     setCopied(true);
@@ -95,7 +100,14 @@ export default function SettingsView({ game, myPlayerId }: Props) {
         <div className="space-y-2">
           <div className="flex items-center justify-between">
             <span className="show-caps">Players ({game.players.length})</span>
-            {saving && <span className="show-caps">Saving…</span>}
+            <div className="flex items-center gap-2">
+              {saving && <span className="show-caps">Saving…</span>}
+              {isHost && game.players.length > 1 && (
+                <button onClick={shufflePlayers} className="show-btn show-btn-ghost" style={{ padding: '4px 10px', fontSize: '12px' }}>
+                  Shuffle
+                </button>
+              )}
+            </div>
           </div>
 
           {game.players.length === 0 && (
@@ -143,15 +155,25 @@ export default function SettingsView({ game, myPlayerId }: Props) {
                     <span className="font-mono text-sm font-bold" style={{ color: 'var(--show-ink-2)' }}>{msToSeconds(player.allocatedTimeMs)}s</span>
                   )}
 
-                  {isHost && (
+                  {isHost && game.players.length > 1 && (
                     <div className="flex flex-col gap-0.5">
-                      <button onClick={() => movePlayer(index, -1)} disabled={index === 0} style={{ color: 'var(--show-ink-3)', fontSize: '10px', lineHeight: 1, opacity: index === 0 ? 0.2 : 1 }}>▲</button>
-                      <button onClick={() => movePlayer(index, 1)} disabled={index === game.players.length - 1} style={{ color: 'var(--show-ink-3)', fontSize: '10px', lineHeight: 1, opacity: index === game.players.length - 1 ? 0.2 : 1 }}>▼</button>
+                      <button
+                        onClick={() => movePlayer(index, -1)}
+                        disabled={index === 0}
+                        className="show-btn"
+                        style={{ width: '36px', height: '28px', padding: 0, fontSize: '14px', opacity: index === 0 ? 0.25 : 1, lineHeight: 1 }}
+                      >▲</button>
+                      <button
+                        onClick={() => movePlayer(index, 1)}
+                        disabled={index === game.players.length - 1}
+                        className="show-btn"
+                        style={{ width: '36px', height: '28px', padding: 0, fontSize: '14px', opacity: index === game.players.length - 1 ? 0.25 : 1, lineHeight: 1 }}
+                      >▼</button>
                     </div>
                   )}
 
                   {isHost && game.players.length > 1 && (
-                    <button onClick={() => removePlayer(player.id)} className="show-caps ml-1" style={{ color: 'var(--show-ink-3)', fontSize: '16px' }}>×</button>
+                    <button onClick={() => removePlayer(player.id)} className="show-btn" style={{ width: '36px', height: '60px', padding: 0, fontSize: '18px', color: 'var(--show-ink-3)' }}>×</button>
                   )}
                 </div>
               </div>
