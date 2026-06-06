@@ -18,6 +18,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import type { GameState, PlayerState } from '@/lib/types';
 import { PLAYER_COLORS } from '@/lib/colors';
+import { sounds } from '@/lib/sounds';
 
 interface Props {
   game: GameState;
@@ -194,6 +195,7 @@ export default function SettingsView({ game, myPlayerId }: Props) {
     const current = new Set(game.players.map((p) => p.id));
     const added = [...current].filter((id) => !prevPlayerIds.current.has(id));
     if (added.length > 0 && prevPlayerIds.current.size > 0) {
+      sounds.playerJoin();
       setNewPlayerIds(new Set(added));
       const t = setTimeout(() => setNewPlayerIds(new Set()), 400);
       prevPlayerIds.current = current;
@@ -254,11 +256,13 @@ export default function SettingsView({ game, myPlayerId }: Props) {
   }
 
   function shufflePlayers() {
+    sounds.click();
     const shuffled = [...game.players].sort(() => Math.random() - 0.5);
     save({ players: shuffled.map((p, i) => ({ ...p, order: i })) });
   }
 
   async function copyLink() {
+    sounds.click();
     await navigator.clipboard.writeText(`${window.location.origin}/${game.id}`);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);

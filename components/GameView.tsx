@@ -1,6 +1,7 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
 import type { GameState } from '@/lib/types';
+import { sounds } from '@/lib/sounds';
 
 interface Props {
   game: GameState;
@@ -15,23 +16,6 @@ function formatTime(ms: number): string {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
-function playBuzzer() {
-  try {
-    const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-    const ctx = new AudioCtx();
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-    osc.type = 'sawtooth';
-    osc.frequency.setValueAtTime(120, ctx.currentTime);
-    osc.frequency.linearRampToValueAtTime(60, ctx.currentTime + 0.8);
-    gain.gain.setValueAtTime(0.6, ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(0, ctx.currentTime + 1.0);
-    osc.start(ctx.currentTime);
-    osc.stop(ctx.currentTime + 1.0);
-  } catch { /* autoplay blocked */ }
-}
 
 export default function GameView({ game, myPlayerId, clockOffset = 0 }: Props) {
   const now = () => Date.now() + clockOffset;
@@ -41,6 +25,8 @@ export default function GameView({ game, myPlayerId, clockOffset = 0 }: Props) {
   const timeoutCalled = useRef(false);
   const startNextCalled = useRef(false);
   const buzzerPlayed = useRef(false);
+  const prevStatus = useRef(game.status);
+  const prevCountNum = useRef(-1);
 
   const myPlayer = game.players.find((p) => p.id === myPlayerId);
   const currentPlayer = game.players[game.currentPlayerIndex];
@@ -74,7 +60,7 @@ export default function GameView({ game, myPlayerId, clockOffset = 0 }: Props) {
   // Buzzer + timeout
   useEffect(() => {
     if (game.status !== 'playing' || !isMyTurn) return;
-    if (displayMs <= 0 && !buzzerPlayed.current) { buzzerPlayed.current = true; playBuzzer(); }
+    if (displayMs <= 0 && !buzzerPlayed.current) { buzzerPlayed.current = true; sounds.buzzer(); }
     if (displayMs <= 0 && !timeoutCalled.current) {
       timeoutCalled.current = true;
       fetch(`/api/game/${game.id}/timeout`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ playerId: myPlayerId }) });
@@ -98,8 +84,27 @@ export default function GameView({ game, myPlayerId, clockOffset = 0 }: Props) {
     }
   }, [game.status, game.phaseStartedAt, game.phaseDurationMs, game.id, myPlayerId]);
 
+  // Countdown ticks and GO!
+  useEffect(() => {
+    if (game.status !== 'countdown') { prevCountNum.current = -1; return; }
+    const n = phaseMs > 0 ? Math.ceil(phaseMs / 1000) : 0;
+    if (n !== prevCountNum.current) {
+      prevCountNum.current = n;
+      if (n > 0) sounds.countdownTick();
+      else sounds.go();
+    }
+  }, [game.status, phaseMs > 0 ? Math.ceil(phaseMs / 1000) : 0]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  // Buffer chime and game-over fanfare
+  useEffect(() => {
+    if (game.status === 'buffer' && prevStatus.current !== 'buffer') sounds.bufferChime();
+    if (game.status === 'finished' && prevStatus.current !== 'finished') sounds.gameOver();
+    prevStatus.current = game.status;
+  }, [game.status]);
+
   function handlePointerDown(e: React.PointerEvent<HTMLButtonElement>) {
     if (!isMyTurn || myTimedOut || game.status !== 'playing') return;
+    sounds.endTurn();
     const rect = e.currentTarget.getBoundingClientRect();
     const id = Date.now();
     setRipples((r) => [...r, { id, x: e.clientX - rect.left, y: e.clientY - rect.top }]);
@@ -111,9 +116,11 @@ export default function GameView({ game, myPlayerId, clockOffset = 0 }: Props) {
     await fetch(`/api/game/${game.id}/turn`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ playerId: myPlayerId }) });
   }
   async function handlePause() {
+    sounds.click();
     await fetch(`/api/game/${game.id}/pause`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'pause' }) });
   }
   async function handleResume() {
+    sounds.click();
     await fetch(`/api/game/${game.id}/pause`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'resume' }) });
   }
   async function handleCancel() {
