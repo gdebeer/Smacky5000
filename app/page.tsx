@@ -28,15 +28,24 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12" style={{ background: 'var(--show-paper)' }}>
+    <div className="min-h-screen flex flex-col items-center justify-center px-6 py-12">
       <div className="w-full max-w-xs space-y-10">
 
         {/* Title */}
         <div>
           <div className="show-sticker mb-4" style={{ display: 'inline-flex' }}>Multiplayer Clock</div>
-          <h1 className="font-black leading-none" style={{ fontSize: 'clamp(3rem, 18vw, 5rem)', color: 'var(--show-ink)', letterSpacing: '-0.03em' }}>
+          <h1
+            style={{
+              fontFamily: 'var(--font-display)',
+              fontSize: 'clamp(2.6rem, 16vw, 4.5rem)',
+              color: 'var(--show-ink)',
+              letterSpacing: '0.04em',
+              lineHeight: 1,
+              fontWeight: 900,
+            }}
+          >
             SMACKY<br />
-            <span style={{ color: 'var(--show-accent)' }}>5000</span>
+            <span style={{ color: 'var(--show-accent)', textShadow: '0 0 20px rgba(0,196,232,.4)' }}>5000</span>
           </h1>
         </div>
 
@@ -47,7 +56,7 @@ export default function Home() {
             onClick={handleCreate}
             disabled={creating}
             className="show-btn show-btn-primary w-full"
-            style={{ padding: '18px', fontSize: '1.25rem', boxShadow: 'var(--show-shadow-lg)' }}
+            style={{ padding: '18px', fontSize: '1rem', letterSpacing: '.14em' }}
           >
             {creating ? 'Creating…' : 'New Game'}
           </button>
@@ -55,9 +64,9 @@ export default function Home() {
 
         {/* Divider */}
         <div className="flex items-center gap-3">
-          <div className="flex-1" style={{ height: '1.5px', background: 'var(--show-line)' }} />
+          <div className="flex-1" style={{ height: '1px', background: 'var(--show-line)' }} />
           <span className="show-caps">or join</span>
-          <div className="flex-1" style={{ height: '1.5px', background: 'var(--show-line)' }} />
+          <div className="flex-1" style={{ height: '1px', background: 'var(--show-line)' }} />
         </div>
 
         {/* Join */}
@@ -69,14 +78,14 @@ export default function Home() {
             onChange={(e) => setJoinCode(e.target.value.toUpperCase())}
             onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
             maxLength={3}
-            className="show-input text-center font-mono uppercase tracking-widest text-xl"
-            style={{ fontFamily: 'var(--font-mono)' }}
+            className="show-input text-center uppercase tracking-widest"
+            style={{ fontFamily: 'var(--font-mono)', fontSize: '1.5rem', letterSpacing: '0.3em' }}
           />
           <button
             onClick={handleJoin}
             disabled={!joinCode.trim()}
             className="show-btn show-btn-ink w-full"
-            style={{ padding: '14px' }}
+            style={{ padding: '14px', letterSpacing: '.08em' }}
           >
             Join Game
           </button>

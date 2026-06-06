@@ -188,25 +188,25 @@ export default function SettingsView({ game, myPlayerId }: Props) {
   }
 
   return (
-    <div className="min-h-screen px-4 py-6 space-y-5" style={{ background: 'var(--show-paper)' }}>
+    <div className="min-h-screen px-4 py-6 space-y-5">
       <div className="max-w-lg mx-auto space-y-5">
 
         {/* Header */}
         <div className="flex items-start justify-between">
           <div>
-            <h1 className="font-black leading-none" style={{ fontSize: '1.8rem', color: 'var(--show-ink)', letterSpacing: '-0.03em' }}>
-              SMACKY <span style={{ color: 'var(--show-accent)' }}>5000</span>
+            <h1 style={{ fontFamily: 'var(--font-display)', fontSize: '1.6rem', color: 'var(--show-ink)', letterSpacing: '0.04em', fontWeight: 900, lineHeight: 1 }}>
+              SMACKY <span style={{ color: 'var(--show-accent)', textShadow: '0 0 14px rgba(0,196,232,.4)' }}>5000</span>
             </h1>
-            <span className="show-caps">Game Setup</span>
+            <span className="show-caps" style={{ marginTop: '4px', display: 'block' }}>Game Setup</span>
           </div>
           <div className="text-right">
             <span className="show-caps">Code</span>
-            <p className="font-mono font-black text-2xl mt-0.5" style={{ color: 'var(--show-accent)', letterSpacing: '0.05em' }}>{game.id}</p>
+            <p className="font-mono font-black text-2xl mt-0.5" style={{ color: 'var(--show-accent)', letterSpacing: '0.15em', textShadow: '0 0 12px rgba(0,196,232,.35)' }}>{game.id}</p>
           </div>
         </div>
 
         {/* Share */}
-        <button onClick={copyLink} className="show-btn show-btn-ghost w-full text-left" style={{ padding: '10px 12px', borderColor: 'var(--show-line)' }}>
+        <button onClick={copyLink} className="show-btn show-btn-ghost w-full text-left" style={{ padding: '10px 14px' }}>
           <div>
             <span className="show-caps">Invite link — tap to copy</span>
             <p className="font-mono text-sm mt-0.5 truncate" style={{ color: copied ? 'var(--show-good)' : 'var(--show-ink-2)' }}>
