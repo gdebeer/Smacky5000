@@ -70,7 +70,7 @@ export default function Home() {
             onKeyDown={(e) => e.key === 'Enter' && handleJoin()}
             maxLength={3}
             className="show-input text-center uppercase"
-            style={{ fontFamily: 'var(--font-mono)', fontSize: '2rem', letterSpacing: '0.3em', padding: '16px' }}
+            style={{ fontFamily: 'var(--font-sans)', fontSize: '2rem', letterSpacing: '0.3em', padding: '16px', fontWeight: 800 }}
           />
           <button
             onClick={handleJoin}

@@ -283,7 +283,7 @@ export default function SettingsView({ game, myPlayerId }: Props) {
           </div>
           <div className="text-right">
             <span className="show-caps">Code</span>
-            <p className="font-mono font-black text-2xl mt-0.5" style={{ color: 'var(--show-accent)', letterSpacing: '0.15em', textShadow: '0 0 12px rgba(0,196,232,.3)' }}>{game.id}</p>
+            <p className="font-black text-2xl mt-0.5" style={{ color: 'var(--show-accent)', letterSpacing: '0.15em' }}>{game.id}</p>
           </div>
         </div>
 

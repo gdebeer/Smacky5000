@@ -46,7 +46,7 @@ export default function JoinView({ gameId, onJoin }: Props) {
           <div className="space-y-4">
             <div>
               <span className="show-caps">Game Code</span>
-              <p className="font-mono font-bold text-2xl mt-1" style={{ color: 'var(--show-accent)', letterSpacing: '0.2em', textShadow: '0 0 12px rgba(0,196,232,.3)' }}>{gameId}</p>
+              <p className="font-bold text-2xl mt-1" style={{ color: 'var(--show-accent)', letterSpacing: '0.2em', textShadow: `0 0 12px color-mix(in srgb, var(--show-accent) 40%, transparent)` }}>{gameId}</p>
             </div>
 
             <div className="space-y-3">
