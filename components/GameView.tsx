@@ -167,16 +167,46 @@ export default function GameView({ game, myPlayerId, clockOffset = 0 }: Props) {
       style={{ '--show-accent': myColor } as React.CSSProperties}
     >
 
+      {/* Player strip */}
+      <div className="flex items-center justify-center gap-4 px-4 pt-5 pb-3" style={{ flexWrap: 'wrap' }}>
+        {[...game.players].sort((a, b) => a.order - b.order).map((p) => {
+          const isActive = p.id === currentPlayer?.id;
+          return (
+            <div
+              key={p.id}
+              style={{
+                display: 'flex', alignItems: 'center', gap: '6px',
+                opacity: isActive ? 1 : 0.2,
+                transition: 'opacity 0.3s ease',
+              }}
+            >
+              <div style={{
+                width: 7, height: 7, borderRadius: '50%',
+                background: p.color,
+                boxShadow: isActive ? `0 0 8px ${p.color}` : 'none',
+                flexShrink: 0,
+              }} />
+              <span style={{
+                fontSize: '12px',
+                fontWeight: isActive ? 700 : 500,
+                color: isActive ? p.color : 'var(--show-ink-2)',
+                textDecoration: p.timedOut ? 'line-through' : 'none',
+                letterSpacing: '0.01em',
+              }}>
+                {p.name}
+              </span>
+            </div>
+          );
+        })}
+      </div>
+
       {/* Header */}
-      <div className="flex items-center justify-between px-4 pt-6 pb-3" style={{ borderBottom: '1px solid var(--show-line)' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{ width: 10, height: 10, borderRadius: '50%', background: myColor, boxShadow: `0 0 8px ${myColor}` }} />
-          <div>
-            <span className="show-caps">Your time</span>
-            <p className="font-bold text-sm mt-0.5 truncate max-w-[160px]" style={{ color: 'var(--show-ink)' }}>
-              {myPlayer?.name ?? '—'}
-            </p>
-          </div>
+      <div className="flex items-center justify-between px-4 pb-3" style={{ borderBottom: '1px solid var(--show-line)' }}>
+        <div>
+          <span className="show-caps">Your time</span>
+          <p className="font-bold text-sm mt-0.5 truncate max-w-[180px]" style={{ color: 'var(--show-ink)' }}>
+            {myPlayer?.name ?? '—'}
+          </p>
         </div>
         {(game.status === 'playing' || game.status === 'buffer') && (
           <button onClick={handlePause} className="show-btn show-btn-ink" style={{ padding: '7px 14px', fontSize: '12px' }}>
@@ -223,29 +253,6 @@ export default function GameView({ game, myPlayerId, clockOffset = 0 }: Props) {
           {myTimedOut && (
             <p className="show-caps mt-1" style={{ color: 'var(--show-warn)' }}>Time&apos;s up!</p>
           )}
-        </div>
-      </div>
-
-      {/* Player strip */}
-      <div className="px-4 pb-3">
-        <div className="flex gap-2 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
-          {[...game.players].sort((a, b) => a.order - b.order).map((p) => {
-            const isActive = p.id === currentPlayer?.id;
-            return (
-              <div
-                key={p.id}
-                className={`show-tag shrink-0 ${p.timedOut ? 'done' : ''}`}
-                style={isActive ? {
-                  background: `${p.color}20`,
-                  borderColor: `${p.color}80`,
-                  color: p.color,
-                  boxShadow: `0 0 10px ${p.color}30`,
-                } : {}}
-              >
-                {p.name}{p.id === myPlayerId ? ' ·you' : ''}
-              </div>
-            );
-          })}
         </div>
       </div>
 
